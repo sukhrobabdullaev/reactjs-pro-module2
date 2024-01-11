@@ -1,4 +1,9 @@
 body {
   background: rgb(213,142,27);
   background: linear-gradient(90deg, rgba(213,142,27,1) 38%, rgba(255,231,0,1) 100%);
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
+
+/* .hover-btn:hover{
+  border: 1px solid #dee2e6!important;
+} */
