@@ -3,10 +3,31 @@
 // nechta todo borligini korishim kerak. 3 items left.
 // All, active va completed buttonlar ga filter.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const Actions = ({ setIsActionVisible }) => {
-  const [selectedId, setSelectedId] = useState(false);
+const Actions = ({
+  setIsActionVisible,
+  todos,
+  setFilteredTodos,
+  selectedId,
+  setSelectedId,
+}) => {
+  const filterTodos = (status) => {
+    if (status === "all") {
+      setFilteredTodos(todos);
+    } else if (status == "active") {
+      const filtered = todos.filter((todo) => todo.status == "active");
+      setFilteredTodos(filtered);
+    } else {
+      const filtered = todos.filter((todo) => todo.status == "completed");
+      setFilteredTodos(filtered);
+    }
+  };
+
+  useEffect(() => {
+    filterTodos(selectedId);
+  }, [selectedId, todos]);
+
   return (
     <>
       <div
@@ -29,26 +50,32 @@ const Actions = ({ setIsActionVisible }) => {
           >
             <i className="bi bi-search cursor-pointer"></i>
           </button>
-          |<span>3 ietms left</span>
+          | {todos && <span>{todos.length} items left</span>}
         </div>
 
         {/* status */}
         <div className="status d-flex gap-2">
           <button
-            onClick={() => setSelectedId(true)}
-            className={!selectedId && `border-1 bg-transparent`}
+            onClick={() => setSelectedId("all")}
+            className={selectedId === "all" ? "border-1 bg-transparent" : ""}
             style={{ fontSize: 15 }}
           >
             All
           </button>
           <button
-            onClick={() => setSelectedId(true)}
-            className={!selectedId && `border-1 bg-transparent`}
+            onClick={() => setSelectedId("active")}
+            className={selectedId === "active" ? "border-1 bg-transparent" : ""}
             style={{ fontSize: 15 }}
           >
             Active
           </button>
-          <button className="border bg-transparent" style={{ fontSize: 15 }}>
+          <button
+            onClick={() => setSelectedId("completed")}
+            className={
+              selectedId === "completed" ? "border-1 bg-transparent" : ""
+            }
+            style={{ fontSize: 15 }}
+          >
             Completed
           </button>
         </div>

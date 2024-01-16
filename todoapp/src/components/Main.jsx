@@ -3,70 +3,58 @@
 
 import { useState } from "react";
 
-const Main = ({ isActionVisible }) => {
-  const todoList = [
-    {
-      id: 1,
-      name: "Item 1",
-      status: false,
-    },
-    {
-      id: 2,
-      name: "Item 2",
-      status: true,
-    },
-    {
-      id: 3,
-      name: "Item 3",
-      status: true,
-    },
-    {
-      id: 4,
-      name: "Item 4",
-      status: false,
-    },
-    {
-      id: 5,
-      name: "Item 5",
-      status: true,
-    },
-  ];
-  const [todos, setTodos] = useState(todoList);
+const Main = ({ isActionVisible, filteredTodos, setTodos, selectedId }) => {
   const [newItem, setNewItem] = useState("");
-  const [isActive, setIsActive] = useState(false);
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [hideSearchResult, setHideSearchResult] = useState(false);
   // console.log(newItem);
+  console.log(filteredTodos);
+  
   const handleAdd = (e) => {
     e.preventDefault();
     if (newItem) {
       const newItemss = {
         id: new Date().getTime(),
         name: newItem,
-        status: false,
+        status: selectedId == "completed" ? "completed" : "active",
       };
-      setTodos([...todos, newItemss]);
+      setTodos([...filteredTodos, newItemss]);
       setNewItem("");
     } else {
       console.log("empty text is not allowed");
-      // throw new Error("empty text is not allowed");
     }
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log("Search");
+    const currentSearchTerm = e.target.value;
+    setSearchTerm(currentSearchTerm);
+    const searchResult = filteredTodos.filter((todo) =>
+      todo.name.toLowerCase().includes(currentSearchTerm.toLowerCase())
+    );
+    setTodos(searchResult);
+    if (currentSearchTerm === "") {
+      setHideSearchResult(true);
+      setTimeout(() => {
+        setHideSearchResult(false);
+      }, 300); // Adjust the duration to match your CSS transition duration
+    } else {
+      setHideSearchResult(false);
+    }
   };
 
   const handleCheck = (id) => {
-    setTodos((prevTodos) => {
-      return prevTodos.map((todo) => {
-        if (todo.id === id) {
-          // Toggle the status
-          return { ...todo, status: !todo.status };
-        }
-        return todo;
-      });
-    });
+    alert("make sure to complete!");
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id
+          ? {
+              ...todo,
+              status: todo.status === "active" ? "completed" : "active",
+            }
+          : todo
+      )
+    );
   };
   return (
     <>
@@ -81,28 +69,32 @@ const Main = ({ isActionVisible }) => {
           />
         </form>
       ) : (
-        <form onSubmit={handleSearch}>
-          <input className="form-control" type="text" placeholder="Search.." />
+        <form>
+          <input
+            className="form-control"
+            type="text"
+            placeholder="Search.."
+            value={searchTerm}
+            onChange={handleSearch}
+          />
         </form>
       )}
       <ul className="list-group mt-4">
-        {todos.map((todo, _) => {
-          return (
-            <li className="list-group-item d-flex" key={todo.id}>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  value=""
-                  id="flexCheckDefault"
-                  defaultChecked={isActive}
-                  onClick={() => handleCheck(todo.id)}
-                />
-              </div>
-              {todo.name}
-            </li>
-          );
-        })}
+        {filteredTodos.map((todo) => (
+          <li className="list-group-item d-flex" key={todo.id}>
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                value=""
+                id={`flexCheckDefault-${todo.id}`}
+                checked={todo.status === "completed"}
+                onChange={() => handleCheck(todo.id)}
+              />
+            </div>
+            {todo.name}
+          </li>
+        ))}
       </ul>
     </>
   );
